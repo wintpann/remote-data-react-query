@@ -18,6 +18,9 @@ module.exports = {
   rules: {
     'import/no-unresolved': 'error',
     'react/prop-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
     'react/no-unescaped-entities': 'off',
     'react/display-name': 'off',
     'react/jsx-key': 'error',
@@ -51,7 +54,7 @@ module.exports = {
       },
     ],
     'arrow-body-style': ['error', 'as-needed'],
-    "react/jsx-curly-brace-presence": "error"
+    'react/jsx-curly-brace-presence': 'error',
   },
   settings: {
     react: {
