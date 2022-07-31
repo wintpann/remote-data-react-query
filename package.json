@@ -1,0 +1,99 @@
+{
+  "name": "remote-data-react-query",
+  "version": "0.0.0",
+  "description": "ADT for react-query",
+  "author": "wintpann",
+  "keywords": [
+    "ADT",
+    "FP",
+    "react-query",
+    "functional",
+    "fp-ts"
+  ],
+  "private": false,
+  "homepage": "https://github.com/wintpann/remote-data-react-query",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wintpann/remote-data-react-query.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wintpann/remote-data-react-query/issues",
+    "email": "vvintpann@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prettier": "prettier --write src --ignore-unknown",
+    "eslint": "eslint --fix src --ext .js,.jsx,.ts,.tsx",
+    "lint": "yarn typecheck && yarn eslint && yarn prettier",
+    "typecheck": "tsc --noEmit",
+    "build:prod": "npx cross-env NODE_ENV=production rollup -c",
+    "build:types": "tsc --emitDeclarationOnly",
+    "dev": "npx cross-env DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
+    "build": "yarn lint && rimraf dist && yarn build:types && yarn build:prod",
+    "release": "yarn build && npx np"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "@tanstack/react-query": ">=4.0.5"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^4.0.10",
+    "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "@rollup/plugin-url": "^7.0.0",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
+    "concurrently": "^7.2.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.20.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-unicorn": "^43.0.1",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "node-sass": "^7.0.1",
+    "np": "^7.6.2",
+    "postcss": "^8.4.14",
+    "prettier": "^2.7.1",
+    "react": "^18.2.0",
+    "react-app-rewired": "^2.2.1",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.77.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --ext .js,.jsx,.ts,.tsx",
+      "prettier --write --ignore-unknown"
+    ],
+    "*.{css,scss}": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "dependencies": {}
+}
