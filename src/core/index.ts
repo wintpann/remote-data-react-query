@@ -2,6 +2,8 @@ import { createElement, Fragment, ReactNode } from 'react';
 import { Option, isNone, some, fromNullable, none, fold as optionFold } from 'fp-ts/Option';
 import { Either, left, right, isLeft } from 'fp-ts/lib/Either';
 import { pipe, Lazy } from 'fp-ts/function';
+import { UseQueryResult } from '@tanstack/react-query/src/types';
+import { UseMutationResult } from '@tanstack/react-query';
 
 /**
  * Initial = {
@@ -151,6 +153,15 @@ const chain = <E, A, B>(fa: RemoteRQ<E, A>, f: (a: A) => RemoteRQ<E, B>): Remote
   return fa as RemoteRQ<E, B>;
 };
 
+const fromQuery = <E, A>(query: UseQueryResult<A, E>): RemoteRQ<E, A> => query;
+
+const fromMutation = <E, A>(mutation: UseMutationResult<A, E>): RemoteRQ<E, A> => {
+  if (mutation.status === 'idle') return initial;
+  if (mutation.status === 'loading') return pending();
+  if (mutation.status === 'success') return success(mutation.data);
+  return failure(mutation.error);
+};
+
 interface SequenceT {
   <E, A>(a: RemoteRQ<E, A>): RemoteRQ<E, [A]>;
 
@@ -257,6 +268,8 @@ export const remoteDataRQ = {
   chain,
   sequenceT,
   sequenceS,
+  fromQuery,
+  fromMutation,
 };
 
 export type RenderRemoteRQProps<E, A> = {
