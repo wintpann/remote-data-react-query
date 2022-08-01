@@ -34,7 +34,7 @@ const Todo = () => {
     <RenderRemoteRQ
       data={data}
       success={JSON.stringify}
-      error={<div>error</div>}
+      failure={<div>error</div>}
       pendingWithData={() => <div>DATA here but its pending</div>}
       pending={<div>just pending</div>}
       initial={<div>initial</div>}

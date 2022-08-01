@@ -34,11 +34,12 @@
     "prettier": "prettier --write src --ignore-unknown",
     "eslint": "eslint --fix src --ext .js,.jsx,.ts,.tsx",
     "lint": "yarn typecheck && yarn eslint && yarn prettier",
+    "test": "jest",
     "typecheck": "tsc --noEmit",
     "build:prod": "npx cross-env NODE_ENV=production rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "dev": "npx cross-env DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
-    "build": "yarn lint && rimraf dist && yarn build:types && yarn build:prod",
+    "build": "yarn test && yarn lint && rimraf dist && yarn build:types && yarn build:prod",
     "release": "yarn build && npx np"
   },
   "browserslist": [
@@ -48,8 +49,8 @@
   ],
   "peerDependencies": {
     "@tanstack/react-query": ">=4.0.5",
-    "react": ">=16.8.0",
-    "fp-ts": ">=2.0.0"
+    "fp-ts": ">=2.0.0",
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.1",
@@ -58,6 +59,7 @@
     "@rollup/plugin-url": "^7.0.0",
     "@tanstack/react-query": "^4.0.10",
     "@tanstack/react-query-devtools": "^4.0.10",
+    "@types/jest": "^28.1.6",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
@@ -74,6 +76,7 @@
     "eslint-plugin-unicorn": "^43.0.1",
     "fp-ts": "^2.12.2",
     "husky": "^8.0.1",
+    "jest": "^28.1.3",
     "lint-staged": "^13.0.3",
     "node-sass": "^7.0.1",
     "np": "^7.6.2",
@@ -86,15 +89,13 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.77.0",
     "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^28.0.7",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix --ext .js,.jsx,.ts,.tsx",
-      "prettier --write --ignore-unknown"
-    ],
-    "*.{css,scss}": [
       "prettier --write --ignore-unknown"
     ]
   },

@@ -109,49 +109,61 @@ const fold =
   <A, E, B>(
     onInitial: Lazy<B>,
     onPending: (data: Option<A>) => B,
-    onError: (e: E) => B,
+    onFailure: (e: E) => B,
     onSuccess: (a: A) => B,
   ) =>
   (data: RemoteRQ<E, A>): B => {
     if (isInitial(data)) return onInitial();
-    if (isFailure(data)) return onError(data.error);
+    if (isFailure(data)) return onFailure(data.error);
     if (isSuccess(data)) return onSuccess(data.data);
     return onPending(fromNullable(data.data));
   };
 
 const getOrElse =
   <A, E>(onElse: Lazy<A>) =>
-  (data: RemoteRQ<E, A>) =>
-    isSuccess(data) ? data.data : onElse();
+  (data: RemoteRQ<E, A>) => {
+    if (isSuccess(data)) return data.data;
+    if (isPending(data) && data.data != null) return data.data;
+    return onElse();
+  };
 
-const toNullable = <E, A>(ma: RemoteRQ<E, A>): A | null => (isSuccess(ma) ? ma.data : null);
+const toNullable = <E, A>(data: RemoteRQ<E, A>): A | null => {
+  if (isSuccess(data)) return data.data;
+  if (isPending(data) && data.data != null) return data.data;
+  return null;
+};
 
-const fromOption = <E, A>(option: Option<A>, error: Lazy<E>): RemoteRQ<E, A> => {
-  if (isNone(option)) return failure(error());
+const fromOption = <E, A>(option: Option<A>, onNone: Lazy<E>): RemoteRQ<E, A> => {
+  if (isNone(option)) return failure(onNone());
   return success(option.value);
 };
 
-const toOption = <E, A>(data: RemoteRQ<E, A>): Option<A> =>
-  isSuccess(data) ? some(data.data) : none;
+const toOption = <E, A>(data: RemoteRQ<E, A>): Option<A> => {
+  if (isSuccess(data)) return some(data.data);
+  if (isPending(data) && data.data != null) return some(data.data);
+  return none;
+};
 
 const fromEither = <E, A>(ea: Either<E, A>): RemoteRQ<E, A> =>
   isLeft(ea) ? failure(ea.left) : success(ea.right);
 
 const toEither =
   <E, A>(onInitial: Lazy<E>, onPending: Lazy<E>) =>
-  (data: RemoteRQ<E, A>) => {
-    if (isInitial(data)) return onInitial();
+  (data: RemoteRQ<E, A>): Either<E, A> => {
+    if (isInitial(data)) return left(onInitial());
     if (isPending(data) && data.data != null) return right(data.data);
-    if (isPending(data)) return onPending();
+    if (isPending(data)) return left(onPending());
     if (isSuccess(data)) return right(data.data);
     return left(data.error);
   };
 
-const chain = <E, A, B>(fa: RemoteRQ<E, A>, f: (a: A) => RemoteRQ<E, B>): RemoteRQ<E, B> => {
-  if (isSuccess(fa)) return f(fa.data);
-  if (isPending(fa) && fa.data != null) return f(fa.data);
-  return fa as RemoteRQ<E, B>;
-};
+const chain =
+  <E, A, B>(f: (a: A) => RemoteRQ<E, B>) =>
+  (data: RemoteRQ<E, A>): RemoteRQ<E, B> => {
+    if (isSuccess(data)) return f(data.data);
+    if (isPending(data) && data.data != null) return f(data.data);
+    return data as RemoteRQ<E, B>;
+  };
 
 const fromQuery = <E, A>(query: UseQueryResult<A, E>): RemoteRQ<E, A> => query;
 
@@ -196,14 +208,15 @@ interface SequenceT {
 
 const sequenceT: SequenceT = ((...list: RemoteRQ<any, any>[]) => {
   const successCount = list.filter(isSuccess).length;
-
   if (successCount === list.length) return success(list.map(({ data }) => data));
 
   const failureEntry = list.find(isFailure);
   if (failureEntry) return failure(failureEntry.error);
 
-  const pendingDataCount = list.filter((el) => isPending(el) && el.data != null).length;
-  if (pendingDataCount === list.length) return pending(list.map(({ data }) => data));
+  const pendingDataOrSuccessCount = list.filter(
+    (el) => (isPending(el) && el.data != null) || isSuccess(el),
+  ).length;
+  if (pendingDataOrSuccessCount === list.length) return pending(list.map(({ data }) => data));
 
   const pendingCount = list.filter(isPending).length;
   if (pendingCount > 0) return pending();
@@ -225,12 +238,12 @@ const sequenceS = (<S extends Record<string, RemoteRQ<any, any>>>(struct: S) => 
   const list = entries.map(([, el]) => el);
 
   // @ts-ignore
-  const tupleSequenced: RemoteRQ<any, any> = sequenceT(...list);
+  const tupleSequence: RemoteRQ<any, any> = sequenceT(...list);
 
-  if (isSuccess(tupleSequenced))
+  if (isSuccess(tupleSequence))
     return success(entries.reduce((acc, [key, el]) => ({ ...acc, [key]: el.data }), {}));
 
-  if (isPending(tupleSequenced) && tupleSequenced.data != null)
+  if (isPending(tupleSequence) && tupleSequence.data != null)
     return pending(
       entries.reduce(
         (acc, [key, el]) => ({
@@ -241,9 +254,9 @@ const sequenceS = (<S extends Record<string, RemoteRQ<any, any>>>(struct: S) => 
       ),
     );
 
-  if (isPending(tupleSequenced)) return pending();
+  if (isPending(tupleSequence)) return pending();
 
-  if (isFailure(tupleSequenced)) return tupleSequenced;
+  if (isFailure(tupleSequence)) return tupleSequence;
 
   return initial;
 }) as SequenceS;
@@ -274,7 +287,7 @@ export const remoteDataRQ = {
 
 export type RenderRemoteRQProps<E, A> = {
   data: RemoteRQ<E, A>;
-  error?: ReactNode;
+  failure?: ReactNode;
   initial?: ReactNode;
   pending?: ReactNode;
   pendingWithData?: (data: A) => ReactNode;
@@ -285,7 +298,7 @@ export const RenderRemoteRQ = <E, A>({
   data,
   pending = null,
   pendingWithData = () => pending,
-  error = null,
+  failure = null,
   initial = null,
   success,
 }: RenderRemoteRQProps<E, A>): JSX.Element =>
@@ -297,7 +310,7 @@ export const RenderRemoteRQ = <E, A>({
       remoteDataRQ.fold(
         () => initial,
         optionFold(() => pending, pendingWithData),
-        () => error,
+        () => failure,
         success,
       ),
     ),
