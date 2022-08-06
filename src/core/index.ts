@@ -342,7 +342,7 @@ const toEither =
  * const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
  * const chained = pipe(
  *   remoteUser,
- *   remoteRQ.chain<Error, User, UserInfo>((user) => remoteRQ.success(`${user.name} ${user.age}`));
+ *   remoteRQ.chain<Error, User, UserInfo>((user) => remoteRQ.success(`${user.name} ${user.age}`))
  * )
  */
 const chain =
@@ -504,11 +504,17 @@ export const remoteRQ = {
 };
 
 export type RenderRemoteRQProps<E, A> = {
+  /** Remote data needs to be rendered */
   data: RemoteRQ<E, A>;
+  /** Render content function on failure state */
   failure?: (e: E) => ReactNode;
+  /** Render content constant on initial state */
   initial?: ReactNode;
+  /** Render content constant on pending state */
   pending?: ReactNode;
+  /** Render content function on pending with data (refetching) state */
   refetching?: (data: A) => ReactNode;
+  /** Render content function on success state */
   success: (data: A) => ReactNode;
 };
 
