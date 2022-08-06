@@ -10692,6 +10692,11 @@ stdout-stream@^1.4.0:
   dependencies:
     readable-stream "^2.0.1"
 
+storybox-react@^1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/storybox-react/-/storybox-react-1.0.13.tgz#2934862c083a179fbaab3d4e2793644598506fbf"
+  integrity sha512-aeCHjiKxidtBd/j75BsWDXNf0H02KI9QQRk68JCOe9SfqTFStAIdQ33urCpdcvT+LlsV9chC/VC9Rz0K7r4pEA==
+
 string-argv@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.1.tgz#95e2fbec0427ae19184935f816d74aaa4c5c19da"

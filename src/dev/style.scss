@@ -1,0 +1,35 @@
+@mixin block() {
+  font-family: monospace;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  white-space: pre;
+}
+
+.rq-title {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.rq-success {
+  background: lightgreen;
+  @include block;
+}
+
+.rq-pending {
+  background: lightgoldenrodyellow;
+  @include block;
+}
+
+.rq-failure {
+  background: lightcoral;
+  @include block;
+}
+
+.rq-initial {
+  background: lightblue;
+  @include block;
+}
