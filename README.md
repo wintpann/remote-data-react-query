@@ -23,7 +23,7 @@ type User = { name: string; phone: string };
 
 export const UsageExample = () => {
     const user: RemoteRQ<Error, User> = useQuery(['user'], () =>
-        fetch(`https://jsonplaceholder.typicode.com/users/1`),
+        fetch(`https://jsonplaceholder.typicode.com/users/1`).then(res => res.json()),
     );
 
     const userPhone = pipe(
