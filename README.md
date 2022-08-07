@@ -297,3 +297,11 @@ export type RenderRemoteRQProps<E, A> = {
     success: (data: A) => ReactNode;
 };
 ```
+
+## CHANGELOG
+
+### 0.0.1 `06.08.2022`
+* Initial release
+
+### 0.0.2 `07.08.2022`
+* Update readme
