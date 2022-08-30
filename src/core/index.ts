@@ -46,8 +46,8 @@ export type RemoteSuccess<A> = RemoteBase & {
   error: null;
 };
 
-export type RemoteFailure<E, A> = RemoteBase & {
-  data: A | undefined;
+export type RemoteFailure<E> = RemoteBase & {
+  data: unknown;
   error: E;
 };
 
@@ -55,7 +55,7 @@ export type RemoteData<E, A> =
   | RemoteInitial
   | RemotePending<A>
   | RemoteSuccess<A>
-  | RemoteFailure<E, A>;
+  | RemoteFailure<E>;
 
 /**
  * RemoteInitial constant
@@ -128,7 +128,7 @@ const success = <A>(value: A): RemoteData<never, A> => ({
  * remote.isInitial(remote.initial) // true
  * remote.isInitial(remote.pending()) // false
  */
-const isInitial = <E, A>(data: RemoteData<E, A>): data is RemoteInitial =>
+const isInitial = (data: RemoteData<unknown, unknown>): data is RemoteInitial =>
   data.status === 'loading' && data.fetchStatus === 'idle';
 
 /**
@@ -139,7 +139,7 @@ const isInitial = <E, A>(data: RemoteData<E, A>): data is RemoteInitial =>
  * remote.isPending(remote.pending()) // true
  * remote.isPending(remote.failure(new Error())) // false
  */
-const isPending = <E, A>(data: RemoteData<E, A>): data is RemotePending<A> =>
+const isPending = <A>(data: RemoteData<unknown, A>): data is RemotePending<A> =>
   data.fetchStatus === 'fetching';
 
 /**
@@ -150,7 +150,7 @@ const isPending = <E, A>(data: RemoteData<E, A>): data is RemotePending<A> =>
  * remote.isFailure(remote.failure(new Error())) // true
  * remote.isFailure(remote.success([])) // false
  */
-const isFailure = <E, A>(data: RemoteData<E, A>): data is RemoteFailure<E, A> =>
+const isFailure = <E>(data: RemoteData<E, unknown>): data is RemoteFailure<E> =>
   data.status === 'error' && data.fetchStatus === 'idle';
 
 /**
@@ -161,7 +161,7 @@ const isFailure = <E, A>(data: RemoteData<E, A>): data is RemoteFailure<E, A> =>
  * remote.isSuccess(remote.success([])) // true
  * remote.isSuccess(remote.pending([])) // false
  */
-const isSuccess = <E, A>(data: RemoteData<E, A>): data is RemoteSuccess<A> =>
+const isSuccess = <A>(data: RemoteData<unknown, A>): data is RemoteSuccess<A> =>
   data.status === 'success' && data.fetchStatus === 'idle';
 
 /**
@@ -177,11 +177,12 @@ const isSuccess = <E, A>(data: RemoteData<E, A>): data is RemoteSuccess<A> =>
  */
 const map =
   <A, E, B>(f: (a: A) => B) =>
-  (data: RemoteData<E, A>): RemoteData<E, B> =>
-    ({
-      ...data,
-      data: data.data != null ? f(data.data) : data.data,
-    } as RemoteData<E, B>);
+  (data: RemoteData<E, A>): RemoteData<E, B> => {
+    if (isSuccess(data)) return remote.success(f(data.data));
+    // TODO think about what if A is actually undefined | null
+    if (isPending(data) && data.data != null) return remote.pending(f(data.data));
+    return data as RemoteData<E, B>;
+  };
 
 /**
  * Unwraps RemoteData<E, A>
@@ -234,8 +235,8 @@ const fold =
  * )
  */
 const getOrElse =
-  <A, E>(onElse: Lazy<A>) =>
-  (data: RemoteData<E, A>) => {
+  <A>(onElse: Lazy<A>) =>
+  (data: RemoteData<unknown, A>) => {
     if (isSuccess(data)) return data.data;
     if (isPending(data) && data.data != null) return data.data;
     return onElse();
@@ -251,7 +252,7 @@ const getOrElse =
  *
  * const nullableUser: User | null = remote.toNullable(remoteUser);
  */
-const toNullable = <E, A>(data: RemoteData<E, A>): A | null => {
+const toNullable = <A>(data: RemoteData<unknown, A>): A | null => {
   if (isSuccess(data)) return data.data;
   if (isPending(data) && data.data != null) return data.data;
   return null;
@@ -323,10 +324,10 @@ const fromEither = <E, A>(ea: Either<E, A>): RemoteData<E, A> =>
 const toEither =
   <E, A>(onInitial: Lazy<E>, onPending: Lazy<E>) =>
   (data: RemoteData<E, A>): Either<E, A> => {
+    if (isSuccess(data)) return right(data.data);
     if (isInitial(data)) return left(onInitial());
     if (isPending(data) && data.data != null) return right(data.data);
     if (isPending(data)) return left(onPending());
-    if (isSuccess(data)) return right(data.data);
     return left(data.error);
   };
 
@@ -373,7 +374,10 @@ interface SequenceT {
 
   <E, A, B>(a: RemoteData<E, A>, b: RemoteData<E, B>): RemoteData<E, [A, B]>;
 
-  <E, A, B, C>(a: RemoteData<E, A>, b: RemoteData<E, B>, c: RemoteData<E, C>): RemoteData<E, [A, B, C]>;
+  <E, A, B, C>(a: RemoteData<E, A>, b: RemoteData<E, B>, c: RemoteData<E, C>): RemoteData<
+    E,
+    [A, B, C]
+  >;
 
   <E, A, B, C, D>(
     a: RemoteData<E, A>,
