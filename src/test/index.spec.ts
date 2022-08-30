@@ -198,9 +198,7 @@ describe('remote-data-react-query', () => {
     const { initial, pending, refetching, failure, success } = setup();
 
     const sequenceSuccess = remote.sequence(success, success);
-    expect(sequenceSuccess).toStrictEqual(
-      remote.success([MOCK.SUCCESS_VALUE, MOCK.SUCCESS_VALUE]),
-    );
+    expect(sequenceSuccess).toStrictEqual(remote.success([MOCK.SUCCESS_VALUE, MOCK.SUCCESS_VALUE]));
 
     const sequenceSuccessPendingWithData = remote.sequence(success, refetching);
     expect(sequenceSuccessPendingWithData).toStrictEqual(

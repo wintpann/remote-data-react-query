@@ -47,7 +47,7 @@ export type RemoteSuccess<A> = RemoteBase & {
 };
 
 export type RemoteFailure<E> = RemoteBase & {
-  data: unknown;
+  data: any;
   error: E;
 };
 
@@ -194,11 +194,11 @@ const map =
  * const remoteUserLeftMapped: RemoteData<{custom: string}, string> = pipe(remoteUser, remote.mapLeft(error => ({custom: String(error)})))
  */
 const mapLeft =
-    <EA, EB, A>(f: (a: EA) => EB) =>
-        (data: RemoteData<EA, A>): RemoteData<EB, A> => {
-          if (isFailure(data)) return remote.failure(f(data.error));
-          return data as RemoteData<EB, A>;
-        };
+  <EA, EB, A>(f: (a: EA) => EB) =>
+  (data: RemoteData<EA, A>): RemoteData<EB, A> => {
+    if (isFailure(data)) return remote.failure(f(data.error));
+    return data as RemoteData<EB, A>;
+  };
 
 /**
  * Unwraps RemoteData<E, A>
