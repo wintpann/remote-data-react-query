@@ -194,59 +194,59 @@ describe('remote-data-react-query', () => {
     expect(chain(success)).toStrictEqual(remote.success(MOCK.SUCCESS_VALUE * 2));
   });
 
-  it('should run sequenceT correctly', () => {
+  it('should run sequence correctly', () => {
     const { initial, pending, refetching, failure, success } = setup();
 
-    const sequenceSuccess = remote.sequenceT(success, success);
+    const sequenceSuccess = remote.sequence(success, success);
     expect(sequenceSuccess).toStrictEqual(
       remote.success([MOCK.SUCCESS_VALUE, MOCK.SUCCESS_VALUE]),
     );
 
-    const sequenceSuccessPendingWithData = remote.sequenceT(success, refetching);
+    const sequenceSuccessPendingWithData = remote.sequence(success, refetching);
     expect(sequenceSuccessPendingWithData).toStrictEqual(
       remote.pending([MOCK.SUCCESS_VALUE, MOCK.PENDING_VALUE]),
     );
 
-    const sequenceSuccessPending = remote.sequenceT(success, pending);
+    const sequenceSuccessPending = remote.sequence(success, pending);
     expect(sequenceSuccessPending).toStrictEqual(remote.pending());
 
-    const sequenceSuccessInitial = remote.sequenceT(success, initial);
+    const sequenceSuccessInitial = remote.sequence(success, initial);
     expect(sequenceSuccessInitial).toStrictEqual(remote.initial);
 
-    const sequenceSuccessFailure = remote.sequenceT(success, failure);
+    const sequenceSuccessFailure = remote.sequence(success, failure);
     expect(sequenceSuccessFailure).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailurePending = remote.sequenceT(failure, pending);
+    const sequenceFailurePending = remote.sequence(failure, pending);
     expect(sequenceFailurePending).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailurePendingWithData = remote.sequenceT(failure, refetching);
+    const sequenceFailurePendingWithData = remote.sequence(failure, refetching);
     expect(sequenceFailurePendingWithData).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailureInitial = remote.sequenceT(failure, initial);
+    const sequenceFailureInitial = remote.sequence(failure, initial);
     expect(sequenceFailureInitial).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailureFailure = remote.sequenceT(failure, failure);
+    const sequenceFailureFailure = remote.sequence(failure, failure);
     expect(sequenceFailureFailure).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequencePendingInitial = remote.sequenceT(pending, initial);
+    const sequencePendingInitial = remote.sequence(pending, initial);
     expect(sequencePendingInitial).toStrictEqual(remote.pending());
 
-    const sequencePendingWithDataInitial = remote.sequenceT(refetching, initial);
+    const sequencePendingWithDataInitial = remote.sequence(refetching, initial);
     expect(sequencePendingWithDataInitial).toStrictEqual(remote.pending());
 
-    const sequenceInitialInitial = remote.sequenceT(initial, initial);
+    const sequenceInitialInitial = remote.sequence(initial, initial);
     expect(sequenceInitialInitial).toStrictEqual(remote.initial);
   });
 
-  it('should run sequenceS correctly', () => {
+  it('should run combine correctly', () => {
     const { initial, pending, refetching, failure, success } = setup();
 
-    const sequenceSuccess = remote.sequenceS({ one: success, two: success });
+    const sequenceSuccess = remote.combine({ one: success, two: success });
     expect(sequenceSuccess).toStrictEqual(
       remote.success({ one: MOCK.SUCCESS_VALUE, two: MOCK.SUCCESS_VALUE }),
     );
 
-    const sequenceSuccessPendingWithData = remote.sequenceS({
+    const sequenceSuccessPendingWithData = remote.combine({
       one: success,
       two: refetching,
     });
@@ -257,40 +257,40 @@ describe('remote-data-react-query', () => {
       }),
     );
 
-    const sequenceSuccessPending = remote.sequenceS({ one: success, two: pending });
+    const sequenceSuccessPending = remote.combine({ one: success, two: pending });
     expect(sequenceSuccessPending).toStrictEqual(remote.pending());
 
-    const sequenceSuccessInitial = remote.sequenceS({ one: success, two: initial });
+    const sequenceSuccessInitial = remote.combine({ one: success, two: initial });
     expect(sequenceSuccessInitial).toStrictEqual(remote.initial);
 
-    const sequenceSuccessFailure = remote.sequenceS({ one: success, two: failure });
+    const sequenceSuccessFailure = remote.combine({ one: success, two: failure });
     expect(sequenceSuccessFailure).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailurePending = remote.sequenceS({ one: failure, two: pending });
+    const sequenceFailurePending = remote.combine({ one: failure, two: pending });
     expect(sequenceFailurePending).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailurePendingWithData = remote.sequenceS({
+    const sequenceFailurePendingWithData = remote.combine({
       one: failure,
       two: refetching,
     });
     expect(sequenceFailurePendingWithData).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailureInitial = remote.sequenceS({ one: failure, two: initial });
+    const sequenceFailureInitial = remote.combine({ one: failure, two: initial });
     expect(sequenceFailureInitial).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequenceFailureFailure = remote.sequenceS({ one: failure, two: failure });
+    const sequenceFailureFailure = remote.combine({ one: failure, two: failure });
     expect(sequenceFailureFailure).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
 
-    const sequencePendingInitial = remote.sequenceS({ one: pending, two: initial });
+    const sequencePendingInitial = remote.combine({ one: pending, two: initial });
     expect(sequencePendingInitial).toStrictEqual(remote.pending());
 
-    const sequencePendingWithDataInitial = remote.sequenceS({
+    const sequencePendingWithDataInitial = remote.combine({
       one: refetching,
       two: initial,
     });
     expect(sequencePendingWithDataInitial).toStrictEqual(remote.pending());
 
-    const sequenceInitialInitial = remote.sequenceS({ one: initial, two: initial });
+    const sequenceInitialInitial = remote.combine({ one: initial, two: initial });
     expect(sequenceInitialInitial).toStrictEqual(remote.initial);
   });
 });

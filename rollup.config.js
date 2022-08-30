@@ -8,7 +8,12 @@ import pkg from './package.json';
 export default [
   {
     input: 'src/index.ts',
-    external: Object.keys(pkg.peerDependencies),
+    external: [
+      ...Object.keys(pkg.peerDependencies),
+      'fp-ts/Option',
+      'fp-ts/Either',
+      'fp-ts/function',
+    ],
     output: [{ file: pkg.main, format: 'es' }],
     plugins: [
       resolve({ extensions: ['.js', '.jsx', '.ts', '.tsx'] }),

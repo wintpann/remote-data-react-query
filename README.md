@@ -254,7 +254,7 @@ const chained = pipe(
 )
 ```
 
-### remote.sequenceT
+### remote.sequence
 ```typescript
 import { remote } from 'remote-data-react-query';
 
@@ -264,10 +264,10 @@ type City = { title: string };
 const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
 const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
 
-const remoteCombined: RemoteData<Error, [User, City]> = remote.sequenceT(remoteUser, remoteCity)
+const remoteCombined: RemoteData<Error, [User, City]> = remote.sequence(remoteUser, remoteCity)
 ```
 
-### remote.sequenceS
+### remote.combine
 ```typescript
 import { remote } from 'remote-data-react-query';
 
@@ -277,7 +277,7 @@ type City = { title: string };
 const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
 const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
 
-const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.sequenceS({user: remoteUser, city: remoteCity})
+const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.combine({user: remoteUser, city: remoteCity})
 ```
 
 ### RenderRemote

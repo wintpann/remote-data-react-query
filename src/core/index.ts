@@ -1,6 +1,6 @@
 import { createElement, Fragment, ReactNode } from 'react';
 import { Option, isNone, some, fromNullable, none, fold as optionFold } from 'fp-ts/Option';
-import { Either, left, right, isLeft } from 'fp-ts/lib/Either';
+import { Either, left, right, isLeft } from 'fp-ts/Either';
 import { pipe, Lazy } from 'fp-ts/function';
 import { UseQueryResult } from '@tanstack/react-query/src/types';
 import { UseMutationResult } from '@tanstack/react-query';
@@ -369,7 +369,7 @@ const fromMutation = <E, A>(mutation: UseMutationResult<A, E>): RemoteData<E, A>
   return failure(mutation.error);
 };
 
-interface SequenceT {
+interface Sequence {
   <E, A>(a: RemoteData<E, A>): RemoteData<E, [A]>;
 
   <E, A, B>(a: RemoteData<E, A>, b: RemoteData<E, B>): RemoteData<E, [A, B]>;
@@ -414,9 +414,9 @@ interface SequenceT {
  * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
  * const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
  *
- * const remoteCombined: RemoteData<Error, [User, City]> = remote.sequenceT(remoteUser, remoteCity)
+ * const remoteCombined: RemoteData<Error, [User, City]> = remote.sequence(remoteUser, remoteCity)
  */
-const sequenceT: SequenceT = ((...list: RemoteData<any, any>[]) => {
+const sequence: Sequence = ((...list: RemoteData<any, any>[]) => {
   const successCount = list.filter(isSuccess).length;
   if (successCount === list.length) return success(list.map(({ data }) => data));
 
@@ -432,9 +432,9 @@ const sequenceT: SequenceT = ((...list: RemoteData<any, any>[]) => {
   if (pendingCount > 0) return pending();
 
   return initial;
-}) as SequenceT;
+}) as Sequence;
 
-interface SequenceS {
+interface Combine {
   <E, S extends Record<string, RemoteData<any, any>>>(struct: S): RemoteData<
     E,
     {
@@ -453,14 +453,14 @@ interface SequenceS {
  * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
  * const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
  *
- * const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.sequenceS({user: remoteUser, city: remoteCity})
+ * const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.combine({user: remoteUser, city: remoteCity})
  */
-const sequenceS = (<S extends Record<string, RemoteData<any, any>>>(struct: S) => {
+const combine = (<S extends Record<string, RemoteData<any, any>>>(struct: S) => {
   const entries = Object.entries(struct);
   const list = entries.map(([, el]) => el);
 
   // @ts-ignore
-  const tupleSequence: RemoteData<any, any> = sequenceT(...list);
+  const tupleSequence: RemoteData<any, any> = sequence(...list);
 
   if (isSuccess(tupleSequence))
     return success(entries.reduce((acc, [key, el]) => ({ ...acc, [key]: el.data }), {}));
@@ -481,7 +481,7 @@ const sequenceS = (<S extends Record<string, RemoteData<any, any>>>(struct: S) =
   if (isFailure(tupleSequence)) return tupleSequence;
 
   return initial;
-}) as SequenceS;
+}) as Combine;
 
 export const remote = {
   initial,
@@ -501,8 +501,8 @@ export const remote = {
   fromEither,
   toEither,
   chain,
-  sequenceT,
-  sequenceS,
+  sequence,
+  combine,
   fromQuery,
   fromMutation,
 };
