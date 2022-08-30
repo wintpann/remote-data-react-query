@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { pipe } from 'fp-ts/function';
 import { useNumberControl } from 'storybox-react';
-import { remoteRQ, RemoteRQ } from '../../core';
+import { remote, RemoteData } from '../../core';
 import { api, Success, User } from './util';
 
 const elseUser = {
@@ -38,11 +38,11 @@ export const GetOrElse = () => {
     defaultValue: 1,
   });
 
-  const user: RemoteRQ<Error, User> = useQuery(['user', userId], () => api.getUser(userId));
+  const user: RemoteData<Error, User> = useQuery(['user', userId], () => api.getUser(userId));
 
   const userAddress: User = pipe(
     user,
-    remoteRQ.getOrElse(() => elseUser),
+    remote.getOrElse(() => elseUser),
   );
 
   return <Success data={userAddress} />;

@@ -16,23 +16,23 @@
 ```typescript jsx
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { remoteRQ, RemoteRQ, RenderRemoteRQ } from 'remote-data-react-query';
+import { remote, RemoteData, RenderRemote } from 'remote-data-react-query';
 import { pipe } from 'fp-ts/function';
 
 type User = { name: string; phone: string };
 
 export const UsageExample = () => {
-    const user: RemoteRQ<Error, User> = useQuery(['user'], () =>
+    const user: RemoteData<Error, User> = useQuery(['user'], () =>
         fetch(`https://jsonplaceholder.typicode.com/users/1`).then(res => res.json()),
     );
 
     const userPhone = pipe(
         user,
-        remoteRQ.map((user) => user.phone),
+        remote.map((user) => user.phone),
     );
 
     return (
-        <RenderRemoteRQ
+        <RenderRemote
             data={userPhone}
             success={(phone) => <div>{phone}</div>}
             refetching={(phone) => <div>{phone} refreshing...</div>}
@@ -46,111 +46,111 @@ export const UsageExample = () => {
 
 ## API
 
-### remoteRQ.initial
+### remote.initial
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 
-const initialUsers: RemoteRQ<Error, User[]> = remoteRQ.initial;
+const initialUsers: RemoteData<Error, User[]> = remote.initial;
 ```
 
-### remoteRQ.pending
+### remote.pending
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 
-const pendingUsersWithData: RemoteRQ<Error, User[]> = remoteRQ.pending([{name: "John", age: 20}]);
+const pendingUsersWithData: RemoteData<Error, User[]> = remote.pending([{name: "John", age: 20}]);
 
-const pendingUsers: RemoteRQ<Error, User[]> = remoteRQ.pending();
+const pendingUsers: RemoteData<Error, User[]> = remote.pending();
 ```
 
-### remoteRQ.failure
+### remote.failure
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 
-const failureUsers: RemoteRQ<Error, User[]> = remoteRQ.failure(new Error('failed to fetch'));
+const failureUsers: RemoteData<Error, User[]> = remote.failure(new Error('failed to fetch'));
 
 // left part can be whatever you need
-const failureUsersCustomError: RemoteRQ<{reason: string}, User[]> = remoteRQ.failure({reason: 'failed to fetch'});
+const failureUsersCustomError: RemoteData<{reason: string}, User[]> = remote.failure({reason: 'failed to fetch'});
 ```
 
-### remoteRQ.success
+### remote.success
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 
-const successUsers: RemoteRQ<Error, User[]> = remoteRQ.success([{name: "John", age: 20}])
+const successUsers: RemoteData<Error, User[]> = remote.success([{name: "John", age: 20}])
 ```
 
-### remoteRQ.isInitial
+### remote.isInitial
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
-remoteRQ.isInitial(remoteRQ.initial) // true
+remote.isInitial(remote.initial) // true
 
-remoteRQ.isInitial(remoteRQ.pending()) // false
+remote.isInitial(remote.pending()) // false
 ```
 
-### remoteRQ.isPending
+### remote.isPending
 ```typescript
 
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
-remoteRQ.isPending(remoteRQ.pending()) // true
+remote.isPending(remote.pending()) // true
 
-remoteRQ.isPending(remoteRQ.failure(new Error())) // false
+remote.isPending(remote.failure(new Error())) // false
 ```
 
-### remoteRQ.isFailure
+### remote.isFailure
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
-remoteRQ.isFailure(remoteRQ.failure(new Error())) // true
+remote.isFailure(remote.failure(new Error())) // true
 
-remoteRQ.isFailure(remoteRQ.success([])) // false
+remote.isFailure(remote.success([])) // false
 ```
 
-### remoteRQ.isSuccess
+### remote.isSuccess
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
-remoteRQ.isSuccess(remoteRQ.success([])) // true
+remote.isSuccess(remote.success([])) // true
 
-remoteRQ.isSuccess(remoteRQ.pending([])) // false
+remote.isSuccess(remote.pending([])) // false
 ```
 
-### remoteRQ.map
+### remote.map
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { pipe } from 'fp-ts/function';
 
 type User = { name: string; age: number };
 type UserInfo = string; // name + age
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
-const remoteUserName: RemoteRQ<Error, UserInfo> = pipe(remoteUser, remoteRQ.map(user => `${user.name} ${user.age}`))
+const remoteUserName: RemoteData<Error, UserInfo> = pipe(remoteUser, remote.map(user => `${user.name} ${user.age}`))
 ```
 
-### remoteRQ.fold
+### remote.fold
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { pipe, identity } from 'fp-ts/function';
 import { option } from 'fp-ts';
 
 type User = { name: string; age: number };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
 const user: string = pipe(
   remoteUser,
-  remoteRQ.map(user => `${user.name} ${user.age}`),
-  remoteRQ.fold(
+  remote.map(user => `${user.name} ${user.age}`),
+  remote.fold(
     () => 'nothing is fetched',
     option.fold(() => 'just pending', (userInfo) => `info: ${userInfo}. pending again for some reason`),
     (e) => e.message,
@@ -159,36 +159,36 @@ const user: string = pipe(
 )
 ```
 
-### remoteRQ.getOrElse
+### remote.getOrElse
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { pipe } from 'fp-ts/function';
 
 type User = { name: string; age: number };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
 const user: string = pipe(
   remoteUser,
-  remoteRQ.map(user => `${user.name} ${user.age}`),
-  remoteRQ.getOrElse(() => 'no user was fetched')
+  remote.map(user => `${user.name} ${user.age}`),
+  remote.getOrElse(() => 'no user was fetched')
 )
 ```
 
-### remoteRQ.toNullable
+### remote.toNullable
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
-const nullableUser: User | null = remoteRQ.toNullable(remoteUser);
+const nullableUser: User | null = remote.toNullable(remoteUser);
 ```
 
-### remoteRQ.fromOption
+### remote.fromOption
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { option } from 'fp-ts';
 import { Option } from 'fp-ts/Option';
 
@@ -196,95 +196,95 @@ type User = { name: string; age: number };
 
 const optionUser: Option<User> = option.some({name: 'John', age: 20})
 
-const remoteFromOptionUser: RemoteRQ<Error, User> = remoteRQ.fromOption(optionUser, () => new Error('option was none'))
+const remoteFromOptionUser: RemoteData<Error, User> = remote.fromOption(optionUser, () => new Error('option was none'))
 ```
 
-### remoteRQ.toOption
+### remote.toOption
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { Option } from 'fp-ts/Option';
 
 type User = { name: string; age: number };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
-const optionUser: Option<User> = remoteRQ.toOption(remoteUser);
+const optionUser: Option<User> = remote.toOption(remoteUser);
 ```
 
-### remoteRQ.fromEither
+### remote.fromEither
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { Either, right } from 'fp-ts/lib/Either';
 
 type User = { name: string; age: number };
 
 const eitherUser: Either<Error, User> = right({name: 'John', age: 20})
 
-const remoteFromEitherUser: RemoteRQ<Error, User> = remoteRQ.fromEither(eitherUser)
+const remoteFromEitherUser: RemoteData<Error, User> = remote.fromEither(eitherUser)
 ```
 
-### remoteRQ.toEither
+### remote.toEither
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { Either } from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/function';
 
 type User = { name: string; age: number };
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
 const eitherUser: Either<Error, User> = pipe(
   remoteUser,
-  remoteRQ.toEither(() => new Error('initial'), () => new Error('pending'))
+  remote.toEither(() => new Error('initial'), () => new Error('pending'))
 )
 ```
 
-### remoteRQ.chain
+### remote.chain
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 import { pipe } from 'fp-ts/function';
 
 type User = { name: string; age: number };
 type UserInfo = string; // name + age
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20})
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
 
 const chained = pipe(
   remoteUser,
-  remoteRQ.chain<Error, User, UserInfo>((user) => remoteRQ.success(`${user.name} ${user.age}`))
+  remote.chain<Error, User, UserInfo>((user) => remote.success(`${user.name} ${user.age}`))
 )
 ```
 
-### remoteRQ.sequenceT
+### remote.sequenceT
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 type City = { title: string };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20});
-const remoteCity: RemoteRQ<Error, City> = remoteRQ.success({title: "New Orleans"});
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
+const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
 
-const remoteCombined: RemoteRQ<Error, [User, City]> = remoteRQ.sequenceT(remoteUser, remoteCity)
+const remoteCombined: RemoteData<Error, [User, City]> = remote.sequenceT(remoteUser, remoteCity)
 ```
 
-### remoteRQ.sequenceS
+### remote.sequenceS
 ```typescript
-import { remoteRQ } from 'remote-data-react-query';
+import { remote } from 'remote-data-react-query';
 
 type User = { name: string; age: number };
 type City = { title: string };
 
-const remoteUser: RemoteRQ<Error, User> = remoteRQ.success({name: "John", age: 20});
-const remoteCity: RemoteRQ<Error, City> = remoteRQ.success({title: "New Orleans"});
+const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
+const remoteCity: RemoteData<Error, City> = remote.success({title: "New Orleans"});
 
-const remoteCombined: RemoteRQ<Error, {user: User; city: City}> = remoteRQ.sequenceS({user: remoteUser, city: remoteCity})
+const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.sequenceS({user: remoteUser, city: remoteCity})
 ```
 
-### RenderRemoteRQ
+### RenderRemote
 ```typescript
-export type RenderRemoteRQProps<E, A> = {
+export type RenderRemoteProps<E, A> = {
     /** Remote data needs to be rendered */
-    data: RemoteRQ<E, A>;
+    data: RemoteData<E, A>;
     /** Render content function on failure state */
     failure?: (e: E) => ReactNode;
     /** Render content constant on initial state */
