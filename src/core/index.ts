@@ -185,6 +185,22 @@ const map =
   };
 
 /**
+ * Transforms the left part of RemoteData<E, A>
+ *
+ * @example
+ * import { remote } from 'remote-data-react-query';
+ * import { pipe } from 'fp-ts/function';
+ * const remoteUser: RemoteData<Error, string> = remote.failure(new Error('could not fetch'))
+ * const remoteUserLeftMapped: RemoteData<{custom: string}, string> = pipe(remoteUser, remote.mapLeft(error => ({custom: String(error)})))
+ */
+const mapLeft =
+    <EA, EB, A>(f: (a: EA) => EB) =>
+        (data: RemoteData<EA, A>): RemoteData<EB, A> => {
+          if (isFailure(data)) return remote.failure(f(data.error));
+          return data as RemoteData<EB, A>;
+        };
+
+/**
  * Unwraps RemoteData<E, A>
  *
  * @example
@@ -493,6 +509,7 @@ export const remote = {
   isFailure,
   isSuccess,
   map,
+  mapLeft,
   fold,
   getOrElse,
   toNullable,
