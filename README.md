@@ -317,7 +317,7 @@ export type RenderRemoteProps<E, A> = {
 
 ### 1.0.0 `30.08.2022`
 * Removed RQ suffix
-* Removed useless generics (i.e. getOrElse<E, A> -> getOrElse<A>)
+* Removed useless generics (i.e. `getOrElse<E, A> -> getOrElse<A>`)
 * Renamed sequenceS -> combine
 * Renamed sequenceT -> sequence
 * Fixed fp-ts peer import
