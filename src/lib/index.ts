@@ -2,8 +2,8 @@ import { createElement, Fragment, ReactNode } from 'react';
 import { Option, isNone, some, fromNullable, none, fold as optionFold } from 'fp-ts/Option';
 import { Either, left, right, isLeft } from 'fp-ts/Either';
 import { pipe, Lazy } from 'fp-ts/function';
-import { UseQueryResult } from '@tanstack/react-query/src/types';
-import { UseMutationResult } from '@tanstack/react-query';
+
+const noop = () => undefined;
 
 /**
  * Initial = {
@@ -29,6 +29,8 @@ import { UseMutationResult } from '@tanstack/react-query';
 type RemoteBase = {
   status: string;
   fetchStatus: string;
+  remove: () => void;
+  refetch: () => void
 };
 
 export type RemoteInitial = RemoteBase & {
@@ -57,6 +59,33 @@ export type RemoteData<E, A> =
   | RemoteSuccess<A>
   | RemoteFailure<E>;
 
+const pendingInternal = <A>(value?: A, remove?: () => void, refetch?: () => void): RemoteData<never, A> => ({
+  status: 'loading',
+  fetchStatus: 'fetching',
+  error: null,
+  data: value,
+  remove: remove ?? noop,
+  refetch: refetch ?? noop,
+});
+
+const failureInternal = <E>(error: E, remove?: () => void, refetch?: () => void): RemoteData<E, never> => ({
+  data: undefined,
+  status: 'error',
+  fetchStatus: 'idle',
+  error,
+  remove: remove ?? noop,
+  refetch: refetch ?? noop,
+});
+
+const successInternal = <A>(value: A, remove?: () => void, refetch?: () => void): RemoteData<never, A> => ({
+  status: 'success',
+  fetchStatus: 'idle',
+  error: null,
+  data: value,
+  remove: remove ?? noop,
+  refetch: refetch ?? noop,
+});
+
 /**
  * RemoteInitial constant
  *
@@ -70,6 +99,8 @@ const initial: RemoteData<never, never> = {
   status: 'loading',
   fetchStatus: 'idle',
   error: null,
+  remove: noop,
+  refetch: noop,
 };
 
 /**
@@ -86,6 +117,8 @@ const pending = <A>(value?: A): RemoteData<never, A> => ({
   fetchStatus: 'fetching',
   error: null,
   data: value,
+  remove: noop,
+  refetch: noop,
 });
 
 /**
@@ -103,6 +136,8 @@ const failure = <E>(error: E): RemoteData<E, never> => ({
   status: 'error',
   fetchStatus: 'idle',
   error,
+  remove: noop,
+  refetch: noop,
 });
 
 /**
@@ -118,6 +153,8 @@ const success = <A>(value: A): RemoteData<never, A> => ({
   fetchStatus: 'idle',
   error: null,
   data: value,
+  remove: noop,
+  refetch: noop,
 });
 
 /**
@@ -178,9 +215,9 @@ const isSuccess = <A>(data: RemoteData<unknown, A>): data is RemoteSuccess<A> =>
 const map =
   <A, E, B>(f: (a: A) => B) =>
   (data: RemoteData<E, A>): RemoteData<E, B> => {
-    if (isSuccess(data)) return remote.success(f(data.data));
+    if (isSuccess(data)) return successInternal(f(data.data), data.remove, data.refetch);
     // TODO think about what if A is actually undefined | null
-    if (isPending(data) && data.data != null) return remote.pending(f(data.data));
+    if (isPending(data) && data.data != null) return pendingInternal(f(data.data), data.remove, data.refetch);
     return data as RemoteData<E, B>;
   };
 
@@ -196,7 +233,7 @@ const map =
 const mapLeft =
   <EA, EB, A>(f: (a: EA) => EB) =>
   (data: RemoteData<EA, A>): RemoteData<EB, A> => {
-    if (isFailure(data)) return remote.failure(f(data.error));
+    if (isFailure(data)) return failureInternal(f(data.error), data.remove, data.refetch);
     return data as RemoteData<EB, A>;
   };
 
@@ -370,21 +407,6 @@ const chain =
     return data as RemoteData<E, B>;
   };
 
-/**
- * Returns same object from UseQueryResult<A, E> typed as RemoteData<E, A>
- */
-const fromQuery = <E, A>(query: UseQueryResult<A, E>): RemoteData<E, A> => query;
-
-/**
- * Returns query-like object from UseMutationResult<A, E> typed as RemoteData<E, A>
- */
-const fromMutation = <E, A>(mutation: UseMutationResult<A, E>): RemoteData<E, A> => {
-  if (mutation.status === 'idle') return initial;
-  if (mutation.status === 'loading') return pending();
-  if (mutation.status === 'success') return success(mutation.data);
-  return failure(mutation.error);
-};
-
 interface Sequence {
   <E, A>(a: RemoteData<E, A>): RemoteData<E, [A]>;
 
@@ -432,29 +454,36 @@ interface Sequence {
  *
  * const remoteCombined: RemoteData<Error, [User, City]> = remote.sequence(remoteUser, remoteCity)
  */
-const sequence: Sequence = ((...list: RemoteData<any, any>[]) => {
+const sequence: Sequence = ((...list: RemoteData<unknown, unknown>[]) => {
+  const remove = () => list.forEach((el) => el.remove());
+  const refetch = () => list.forEach((el) => el.refetch());
+
   const successCount = list.filter(isSuccess).length;
-  if (successCount === list.length) return success(list.map(({ data }) => data));
+  if (successCount === list.length) {
+    return successInternal(list.map(({ data }) => data), remove, refetch);
+  }
 
   const failureEntry = list.find(isFailure);
-  if (failureEntry) return failure(failureEntry.error);
+  if (failureEntry) return failureInternal(failureEntry.error, remove, refetch);
 
   const pendingDataOrSuccessCount = list.filter(
     (el) => (isPending(el) && el.data != null) || isSuccess(el),
   ).length;
-  if (pendingDataOrSuccessCount === list.length) return pending(list.map(({ data }) => data));
+  if (pendingDataOrSuccessCount === list.length) {
+    return pendingInternal(list.map(({ data }) => data), remove, refetch);
+  }
 
   const pendingCount = list.filter(isPending).length;
-  if (pendingCount > 0) return pending();
+  if (pendingCount > 0) return pendingInternal(undefined, remove, refetch);
 
   return initial;
 }) as Sequence;
 
 interface Combine {
-  <E, S extends Record<string, RemoteData<any, any>>>(struct: S): RemoteData<
-    E,
+  <S extends Record<string, RemoteData<unknown, unknown>>>(struct: S): RemoteData<
+    S extends Record<string, RemoteData<infer R, unknown>> ? R : never,
     {
-      [K in keyof S]: S[K] extends RemoteData<E, infer R> ? R : never;
+      [K in keyof S]: S[K] extends RemoteData<unknown, infer R> ? R : never;
     }
   >;
 }
@@ -471,30 +500,30 @@ interface Combine {
  *
  * const remoteCombined: RemoteData<Error, {user: User; city: City}> = remote.combine({user: remoteUser, city: remoteCity})
  */
-const combine = (<S extends Record<string, RemoteData<any, any>>>(struct: S) => {
+const combine = ((struct: Record<string, RemoteData<unknown, unknown>>) => {
   const entries = Object.entries(struct);
   const list = entries.map(([, el]) => el);
 
   // @ts-ignore
-  const tupleSequence: RemoteData<any, any> = sequence(...list);
+  const tupleSequence: RemoteData<unknown, unknown> = sequence(...list);
 
-  if (isSuccess(tupleSequence))
-    return success(entries.reduce((acc, [key, el]) => ({ ...acc, [key]: el.data }), {}));
+  if (isSuccess(tupleSequence)) {
+    const result: Record<string, unknown> = {};
+    entries.forEach(([key, el]) => {
+      result[key] = el.data;
+    });
+    return successInternal(result, tupleSequence.remove, tupleSequence.refetch);
+  }
 
-  if (isPending(tupleSequence) && tupleSequence.data != null)
-    return pending(
-      entries.reduce(
-        (acc, [key, el]) => ({
-          ...acc,
-          [key]: el.data,
-        }),
-        {},
-      ),
-    );
+  if (isPending(tupleSequence) && tupleSequence.data != null) {
+    const result: Record<string, unknown> = {};
+    entries.forEach(([key, el]) => {
+      result[key] = el.data;
+    });
+    return pendingInternal(result, tupleSequence.remove, tupleSequence.refetch);
+  }
 
-  if (isPending(tupleSequence)) return pending();
-
-  if (isFailure(tupleSequence)) return tupleSequence;
+  if (isPending(tupleSequence) || isFailure(tupleSequence)) return tupleSequence
 
   return initial;
 }) as Combine;
@@ -520,8 +549,6 @@ export const remote = {
   chain,
   sequence,
   combine,
-  fromQuery,
-  fromMutation,
 };
 
 export type RenderRemoteProps<E, A> = {

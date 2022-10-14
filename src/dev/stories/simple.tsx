@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNumberControl } from 'storybox-react';
-import { RemoteData, RenderRemote } from '../../core';
+import { RemoteData, RenderRemote } from '../../lib';
 import { api, Failure, Initial, Pending, Refetching, Success, User } from './util';
 
 export const Simple = () => {
