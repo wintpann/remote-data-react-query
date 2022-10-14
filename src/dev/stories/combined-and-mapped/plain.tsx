@@ -34,14 +34,17 @@ export const PlainCombinedAndMapped: FC = () => {
   const refetchAll = () => {
     void users.refetch();
     void todos.refetch();
-  }
+  };
 
   return (
     <div>
       <button onClick={refetchAll}>refetch</button>
       <div className="remote">
         {combinedSuccess && (
-            <UsersWithTodosComponent users={combinedAndMapped.users} todos={combinedAndMapped.todos} />
+          <UsersWithTodosComponent
+            users={combinedAndMapped.users}
+            todos={combinedAndMapped.todos}
+          />
         )}
         {combinedLoading && <div>SKELETON</div>}
         {combinedError && <div>ERROR</div>}

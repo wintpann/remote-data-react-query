@@ -10,8 +10,8 @@ export const PlainSimple: FC = () => {
   const isInitial = users.status === 'loading' && users.fetchStatus === 'idle';
 
   const refetch = () => {
-      void users.refetch();
-  }
+    void users.refetch();
+  };
 
   return (
     <div>

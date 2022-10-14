@@ -28,7 +28,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "lite"
   ],
   "scripts": {
     "prettier": "prettier --write src --ignore-unknown",
@@ -39,7 +40,7 @@
     "postbuild": "./postbuild.sh",
     "build:prod": "npx cross-env NODE_ENV=production rollup -c",
     "dev": "npx cross-env DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
-    "build": "yarn lint && yarn test && rimraf dist && yarn build:prod",
+    "build": "yarn lint && yarn test && rimraf dist lite && yarn build:prod",
     "release": "yarn build && npx np"
   },
   "browserslist": [
