@@ -1,34 +1,26 @@
 import React, { FC } from 'react';
+import { APITodo, UserProps } from './model';
 
-export const Success: FC<{ data: any }> = ({ data }) => (
-  <div className="rq-success">
-    <div className="rq-title">success</div>
-    {JSON.stringify(data, null, 2)}
-  </div>
+export const TodoComponent: FC<APITodo> = ({ title }) => <div className="remote-todo">TODO: {title}</div>;
+
+export const UserComponent: FC<UserProps> = ({ fullName, name }) => (
+  <div className="remote-user">USER: {fullName ?? name}</div>
 );
 
-export const Refetching: FC<{ data: any }> = ({ data }) => (
-  <div className="rq-pending">
-    <div className="rq-title">refetching...</div>
-    {JSON.stringify(data, null, 2)}
-  </div>
-);
-
-export const Failure = (e: Error) => (
-  <div className="rq-failure">
-    <div className="rq-title">failure</div>
-    {e.message}
-  </div>
-);
-
-export const Pending = (
-  <div className="rq-pending">
-    <div className="rq-title">pending...</div>
-  </div>
-);
-
-export const Initial = (
-  <div className="rq-initial">
-    <div className="rq-title">initial...</div>
+export const UsersWithTodosComponent: FC<{ users: UserProps[]; todos: APITodo[] }> = ({
+  users,
+  todos,
+}) => (
+  <div className="remote">
+    <div className="remote">
+      {users.map((user) => (
+        <UserComponent {...user} key={user.id} />
+      ))}
+    </div>
+    <div className="remote">
+      {todos.map((todo) => (
+        <TodoComponent {...todo} key={todo.id} />
+      ))}
+    </div>
   </div>
 );

@@ -1,35 +1,33 @@
-@mixin block() {
-  font-family: monospace;
-  margin: 20px;
-  padding: 10px;
+@mixin card() {
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  font-size: 12px;
+  text-align: center;
+  font-family: sans-serif;
   border-radius: 10px;
   display: flex;
-  flex-direction: column;
-  white-space: pre;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  word-break: break-word;
+  transition: transform 0.3s;
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
-.rq-title {
-  font-weight: bold;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
+.remote {
+  display: flex;
+  flex-wrap: wrap;
 
-.rq-success {
-  background: lightgreen;
-  @include block;
-}
+  &-todo {
+    @include card;
+    background-color: bisque;
+  }
 
-.rq-pending {
-  background: lightgoldenrodyellow;
-  @include block;
-}
-
-.rq-failure {
-  background: lightcoral;
-  @include block;
-}
-
-.rq-initial {
-  background: lightblue;
-  @include block;
+  &-user {
+    @include card;
+    background-color: indianred;
+  }
 }
