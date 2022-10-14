@@ -3,6 +3,7 @@
 
 node_modules
 dist
+lite
 
 example/node_modules
 example/build

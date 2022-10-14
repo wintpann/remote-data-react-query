@@ -2,8 +2,8 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { pipe } from 'fp-ts/function';
 import { useNumberControl } from 'storybox-react';
-import { remote, RemoteData, RenderRemote } from '../../lib';
-import { api, Failure, Initial, Pending, Refetching, Success, User } from './util';
+import { remote, RemoteData, RenderRemote } from '../../lib/fp';
+import { api, Failure, Initial, Pending, Refetching, Success, User } from '../util';
 
 export const Map = () => {
   const [userId] = useNumberControl({

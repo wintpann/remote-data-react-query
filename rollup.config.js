@@ -7,17 +7,27 @@ import pkg from './package.json';
 
 export default [
   {
-    input: 'src/index.ts',
+    input: 'src/lib/fp/index.ts',
     external: [
       ...Object.keys(pkg.peerDependencies),
       'fp-ts/Option',
       'fp-ts/Either',
       'fp-ts/function',
     ],
-    output: [{ file: pkg.main, format: 'es' }],
+    output: [{ file: 'dist/rq/fp/index.js', format: 'es' }],
     plugins: [
       resolve({ extensions: ['.js', '.jsx', '.ts', '.tsx'] }),
-      commonjs(),
+      typescript(),
+      url(),
+      terser(),
+    ],
+  },
+  {
+    input: 'src/lib/lite/index.ts',
+    external: Object.keys(pkg.peerDependencies),
+    output: [{ file: 'dist/rq/lite/index.js', format: 'es' }],
+    plugins: [
+      resolve({ extensions: ['.js', '.jsx', '.ts', '.tsx'] }),
       typescript(),
       url(),
       terser(),

@@ -2,8 +2,8 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { pipe } from 'fp-ts/function';
 import { useNumberControl } from 'storybox-react';
-import { remote, RemoteData } from '../../lib';
-import { api, Success, User } from './util';
+import { remote, RemoteData } from '../../lib/fp';
+import { api, Success, User } from '../util';
 
 const elseUser = {
   id: 0,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNumberControl } from 'storybox-react';
-import { remote, RemoteData, RenderRemote } from '../../lib';
-import { api, Failure, Initial, Pending, Refetching, Success, User } from './util';
+import { remote, RemoteData, RenderRemote } from '../../lib/fp';
+import { api, Failure, Initial, Pending, Refetching, Success, User } from '../util';
 
 export const Combine = () => {
   const [userId] = useNumberControl({

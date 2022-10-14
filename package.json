@@ -26,7 +26,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "main": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -36,10 +36,10 @@
     "lint": "yarn typecheck && yarn eslint && yarn prettier",
     "test": "jest",
     "typecheck": "tsc --noEmit",
+    "postbuild": "./postbuild.sh",
     "build:prod": "npx cross-env NODE_ENV=production rollup -c",
-    "build:types": "tsc --emitDeclarationOnly",
     "dev": "npx cross-env DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
-    "build": "yarn test && yarn lint && rimraf dist && yarn build:types && yarn build:prod",
+    "build": "yarn lint && yarn test && rimraf dist && yarn build:prod",
     "release": "yarn build && npx np"
   },
   "browserslist": [
@@ -48,9 +48,14 @@
     "not op_mini all"
   ],
   "peerDependencies": {
-    "@tanstack/react-query": ">=4.0.5",
+    "@tanstack/react-query": ">=4.0.0",
     "fp-ts": ">=2.0.0",
     "react": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "fp-ts": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.1",

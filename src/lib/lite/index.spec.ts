@@ -1,5 +1,4 @@
-import { remote, RemoteData } from '../lib';
-import { either, option } from 'fp-ts';
+import { remote, RemoteData } from './index';
 
 const MOCK = {
   INITIAL_VALUE: 0,
@@ -33,6 +32,7 @@ const setup = () => {
 };
 
 const removeFn = remote.initial.remove;
+const refetchFn = remote.initial.refetch;
 
 describe('remote-data-react-query', () => {
   it('should have correct initial object', () => {
@@ -42,6 +42,7 @@ describe('remote-data-react-query', () => {
       fetchStatus: 'idle',
       error: null,
       remove: removeFn,
+      refetch: refetchFn,
     });
   });
 
@@ -52,6 +53,7 @@ describe('remote-data-react-query', () => {
       error: null,
       data: undefined,
       remove: removeFn,
+      refetch: refetchFn,
     });
 
     expect(remote.pending(MOCK.PENDING_VALUE)).toStrictEqual({
@@ -60,6 +62,7 @@ describe('remote-data-react-query', () => {
       error: null,
       data: MOCK.PENDING_VALUE,
       remove: removeFn,
+      refetch: refetchFn,
     });
   });
 
@@ -70,6 +73,7 @@ describe('remote-data-react-query', () => {
       error: MOCK.FAILURE_VALUE,
       data: undefined,
       remove: removeFn,
+      refetch: refetchFn,
     });
   });
 
@@ -80,6 +84,7 @@ describe('remote-data-react-query', () => {
       error: null,
       data: MOCK.SUCCESS_VALUE,
       remove: removeFn,
+      refetch: refetchFn,
     });
   });
 
@@ -123,10 +128,7 @@ describe('remote-data-react-query', () => {
     const { initial, pending, refetching, failure, success } = setup();
     const fold = remote.fold(
       () => 'initial',
-      option.fold(
-        () => 'pending_with_no_data',
-        () => 'pending_with_data',
-      ),
+      (data) => (data ? 'pending_with_data' : 'pending_with_no_data'),
       () => 'failure',
       () => 'success',
     );
@@ -156,50 +158,6 @@ describe('remote-data-react-query', () => {
     expect(remote.toNullable(refetching)).toBe(MOCK.PENDING_VALUE);
     expect(remote.toNullable(failure)).toBe(null);
     expect(remote.toNullable(success)).toBe(MOCK.SUCCESS_VALUE);
-  });
-
-  it('should run fromOption correctly', () => {
-    const onNone = () => MOCK.FAILURE_VALUE;
-
-    expect(remote.fromOption(option.some(MOCK.SUCCESS_VALUE), onNone)).toStrictEqual(
-      remote.success(MOCK.SUCCESS_VALUE),
-    );
-    expect(remote.fromOption(option.none, onNone)).toStrictEqual(
-      remote.failure(MOCK.FAILURE_VALUE),
-    );
-  });
-
-  it('should run toOption correctly', () => {
-    const { initial, pending, refetching, failure, success } = setup();
-    expect(remote.toOption(initial)).toStrictEqual(option.none);
-    expect(remote.toOption(pending)).toStrictEqual(option.none);
-    expect(remote.toOption(refetching)).toStrictEqual(option.some(MOCK.PENDING_VALUE));
-    expect(remote.toOption(failure)).toStrictEqual(option.none);
-    expect(remote.toOption(success)).toStrictEqual(option.some(MOCK.SUCCESS_VALUE));
-  });
-
-  it('should run fromEither correctly', () => {
-    expect(remote.fromEither(either.right(MOCK.SUCCESS_VALUE))).toStrictEqual(
-      remote.success(MOCK.SUCCESS_VALUE),
-    );
-    expect(remote.fromEither(either.left(MOCK.FAILURE_VALUE))).toStrictEqual(
-      remote.failure(MOCK.FAILURE_VALUE),
-    );
-  });
-
-  it('should run toEither correctly', () => {
-    const { initial, pending, refetching, failure, success } = setup();
-
-    const toEither = remote.toEither(
-      () => MOCK.INITIAL_VALUE,
-      () => MOCK.PENDING_VALUE,
-    );
-
-    expect(toEither(initial)).toStrictEqual(either.left(MOCK.INITIAL_VALUE));
-    expect(toEither(pending)).toStrictEqual(either.left(MOCK.PENDING_VALUE));
-    expect(toEither(refetching)).toStrictEqual(either.right(MOCK.PENDING_VALUE));
-    expect(toEither(failure)).toStrictEqual(either.left(MOCK.FAILURE_VALUE));
-    expect(toEither(success)).toStrictEqual(either.right(MOCK.SUCCESS_VALUE));
   });
 
   it('should run chain correctly', () => {
