@@ -1,3 +1,4 @@
+import { UseQueryResult } from 'react-query';
 import { Fragment, createElement, ReactNode } from 'react';
 
 type RemoteBase = {
@@ -30,6 +31,8 @@ type RemoteFailure<E> = RemoteBase & {
 };
 
 type RemoteData<E, A> = RemoteInitial | RemotePending<A> | RemoteSuccess<A> | RemoteFailure<E>;
+
+export type RemoteQuery<E, A> = RemoteData<E, A> | UseQueryResult<A, E>;
 
 const noop = () => undefined;
 
@@ -139,7 +142,7 @@ const isSuccess = <A>(data: RemoteData<unknown, A>): data is RemoteSuccess<A> =>
 
 const map =
   <A, E, B>(f: (a: A) => B) =>
-  (data: RemoteData<E, A>): RemoteData<E, B> => {
+  (data: RemoteQuery<E, A>): RemoteData<E, B> => {
     if (isSuccess(data))
       return successInternal(f(data.data), data.remove, ignorePromise(data.refetch));
     // TODO think about what if A is actually undefined | null
@@ -150,7 +153,7 @@ const map =
 
 const mapLeft =
   <EA, EB, A>(f: (a: EA) => EB) =>
-  (data: RemoteData<EA, A>): RemoteData<EB, A> => {
+  (data: RemoteQuery<EA, A>): RemoteData<EB, A> => {
     if (isFailure(data))
       return failureInternal(f(data.error), data.remove, ignorePromise(data.refetch));
     return data as RemoteData<EB, A>;
@@ -172,44 +175,44 @@ const toNullable = <A>(data: RemoteData<unknown, A>): A | null => {
 
 const chain =
   <E, A, B>(f: (a: A) => RemoteData<E, B>) =>
-  (data: RemoteData<E, A>): RemoteData<E, B> => {
+  (data: RemoteQuery<E, A>): RemoteData<E, B> => {
     if (isSuccess(data)) return f(data.data);
     if (isPending(data) && data.data != null) return f(data.data);
     return data as RemoteData<E, B>;
   };
 
 interface Sequence {
-  <E, A>(a: RemoteData<E, A>): RemoteData<E, [A]>;
+  <E, A>(a: RemoteQuery<E, A>): RemoteData<E, [A]>;
 
-  <E, A, B>(a: RemoteData<E, A>, b: RemoteData<E, B>): RemoteData<E, [A, B]>;
+  <E, A, B>(a: RemoteQuery<E, A>, b: RemoteQuery<E, B>): RemoteData<E, [A, B]>;
 
-  <E, A, B, C>(a: RemoteData<E, A>, b: RemoteData<E, B>, c: RemoteData<E, C>): RemoteData<
+  <E, A, B, C>(a: RemoteQuery<E, A>, b: RemoteQuery<E, B>, c: RemoteQuery<E, C>): RemoteData<
     E,
     [A, B, C]
   >;
 
   <E, A, B, C, D>(
-    a: RemoteData<E, A>,
-    b: RemoteData<E, B>,
-    c: RemoteData<E, C>,
-    d: RemoteData<E, D>,
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
   ): RemoteData<E, [A, B, C, D]>;
 
   <E, A, B, C, D, F>(
-    a: RemoteData<E, A>,
-    b: RemoteData<E, B>,
-    c: RemoteData<E, C>,
-    d: RemoteData<E, D>,
-    f: RemoteData<E, F>,
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
   ): RemoteData<E, [A, B, C, D, F]>;
 
   <E, A, B, C, D, F, G>(
-    a: RemoteData<E, A>,
-    b: RemoteData<E, B>,
-    c: RemoteData<E, C>,
-    d: RemoteData<E, D>,
-    f: RemoteData<E, F>,
-    g: RemoteData<E, G>,
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
   ): RemoteData<E, [A, B, C, D, F, G]>;
 }
 
@@ -247,10 +250,10 @@ const sequence: Sequence = ((...list: RemoteData<unknown, unknown>[]) => {
 }) as Sequence;
 
 interface Combine {
-  <S extends Record<string, RemoteData<unknown, unknown>>>(struct: S): RemoteData<
-    S extends Record<string, RemoteData<infer R, unknown>> ? R : never,
+  <S extends Record<string, RemoteQuery<unknown, unknown>>>(struct: S): RemoteData<
+    S extends Record<string, RemoteQuery<infer R, unknown>> ? R : never,
     {
-      [K in keyof S]: S[K] extends RemoteData<unknown, infer R> ? R : never;
+      [K in keyof S]: S[K] extends RemoteQuery<unknown, infer R> ? R : never;
     }
   >;
 }
@@ -285,7 +288,7 @@ const combine = ((struct: Record<string, RemoteData<unknown, unknown>>) => {
 
 type RenderRemoteProps<E, A> = {
   /** Remote data needs to be rendered */
-  data: RemoteData<E, A>;
+  data: RemoteQuery<E, A>;
   /** Render content function on failure state */
   failure?: (e: E) => ReactNode;
   /** Render content constant on initial state */
@@ -307,7 +310,7 @@ const fold =
     onFailure: (e: E) => B,
     onSuccess: (a: A) => B,
   ) =>
-  (data: RemoteData<E, A>): B => {
+  (data: RemoteQuery<E, A>): B => {
     if (isInitial(data)) return onInitial();
     if (isFailure(data)) return onFailure(data.error);
     if (isSuccess(data)) return onSuccess(data.data);
