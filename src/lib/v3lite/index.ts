@@ -371,7 +371,7 @@ export const remote = {
    * RemoteInitial constant
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const initialUsers: RemoteData<Error, User[]> = remote.initial;
    */
@@ -380,7 +380,7 @@ export const remote = {
    * RemotePending factory. Can be with or without "transitional" data
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const pendingUsersWithData: RemoteData<Error, User[]> = remote.pending([{name: "John", age: 20}]);
    * const pendingUsers: RemoteData<Error, User[]> = remote.pending();
@@ -390,7 +390,7 @@ export const remote = {
    * RemoteFailure factory. Takes the "left" part of RemoteData
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const failureUsers: RemoteData<Error, User[]> = remote.failure(new Error('failed to fetch'));
    * // left part can be whatever you need
@@ -401,7 +401,7 @@ export const remote = {
    * RemoteSuccess factory. Takes the "right" part of RemoteData
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const successUsers: RemoteData<Error, User[]> = remote.success([{name: "John", age: 20}])
    */
@@ -410,7 +410,7 @@ export const remote = {
    * Checks if RemoteData<E, A> is RemoteInitial
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * remote.isInitial(remote.initial) // true
    * remote.isInitial(remote.pending()) // false
    */
@@ -419,7 +419,7 @@ export const remote = {
    * Checks if RemoteData<E, A> is RemotePending<A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * remote.isPending(remote.pending()) // true
    * remote.isPending(remote.failure(new Error())) // false
    */
@@ -428,7 +428,7 @@ export const remote = {
    * Checks if RemoteData<E, A> is RemoteFailure<E, A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * remote.isFailure(remote.failure(new Error())) // true
    * remote.isFailure(remote.success([])) // false
    */
@@ -437,7 +437,7 @@ export const remote = {
    * Checks if RemoteData<E, A> is RemoteSuccess<A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * remote.isSuccess(remote.success([])) // true
    * remote.isSuccess(remote.pending([])) // false
    */
@@ -446,7 +446,7 @@ export const remote = {
    * Transforms the right part of RemoteData<E, A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * import { pipe } from 'fp-ts/function';
    * type User = { name: string; age: number };
    * type UserInfo = string; // name + age
@@ -458,7 +458,7 @@ export const remote = {
    * Transforms the left part of RemoteData<E, A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * import { pipe } from 'fp-ts/function';
    * const remoteUser: RemoteData<Error, string> = remote.failure(new Error('could not fetch'))
    * const remoteUserLeftMapped: RemoteData<{custom: string}, string> = pipe(remoteUser, remote.mapLeft(error => ({custom: String(error)})))
@@ -468,7 +468,7 @@ export const remote = {
    * Unwraps RemoteData<E, A>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * import { pipe, identity } from 'fp-ts/function';
    * import { option } from 'fp-ts';
    * type User = { name: string; age: number };
@@ -490,7 +490,7 @@ export const remote = {
    * Transforms RemoteData<E, A> to B
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * import { pipe } from 'fp-ts/function';
    * type User = { name: string; age: number };
    * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
@@ -506,7 +506,7 @@ export const remote = {
    * Transforms RemoteData<E, A> to A | null
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20})
    *
@@ -517,7 +517,7 @@ export const remote = {
    * Chains RemoteData<E, A> to RemoteData<E, B>
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * import { pipe } from 'fp-ts/function';
    * type User = { name: string; age: number };
    * type UserInfo = string; // name + age
@@ -533,7 +533,7 @@ export const remote = {
    * Transforms multiple remote data (in tuple) into one
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * type City = { title: string };
    * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
@@ -546,7 +546,7 @@ export const remote = {
    * Transforms multiple remote data (in struct) into one
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * type City = { title: string };
    * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
@@ -559,7 +559,7 @@ export const remote = {
    * Transforms the given value through a pipe of functions
    *
    * @example
-   * import { remote } from 'remote-data-react-query/lite';
+   * import { remote } from 'remote-data-react-query/v3lite';
    * type User = { name: string; age: number };
    * const remoteUser: RemoteData<Error, User> = remote.success({name: "John", age: 20});
    *
