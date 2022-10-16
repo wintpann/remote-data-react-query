@@ -222,6 +222,52 @@ interface Sequence {
     f: RemoteQuery<E, F>,
     g: RemoteQuery<E, G>,
   ): RemoteData<E, [A, B, C, D, F, G]>;
+
+  <E, A, B, C, D, F, G, H>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+  ): RemoteData<E, [A, B, C, D, F, G, H]>;
+
+  <E, A, B, C, D, F, G, H, I>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I]>;
+
+  <E, A, B, C, D, F, G, H, I, J>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+    j: RemoteQuery<E, J>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I, J]>;
+
+  <E, A, B, C, D, F, G, H, I, J, K>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+    j: RemoteQuery<E, J>,
+    k: RemoteQuery<E, K>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I, J, K]>;
 }
 
 const sequence: Sequence = ((...list: RemoteData<unknown, unknown>[]) => {
@@ -377,6 +423,33 @@ export interface Pipe {
     gh: (g: G) => H,
     hi: (h: H) => I,
   ): I;
+
+  <A, B, C, D, E, F, G, H, I, J>(
+    a: A,
+    ab: (a: A) => B,
+    bc: (b: B) => C,
+    cd: (c: C) => D,
+    de: (d: D) => E,
+    ef: (e: E) => F,
+    fg: (f: F) => G,
+    gh: (g: G) => H,
+    hi: (h: H) => I,
+    ij: (i: I) => J,
+  ): J;
+
+  <A, B, C, D, E, F, G, H, I, J, K>(
+    a: A,
+    ab: (a: A) => B,
+    bc: (b: B) => C,
+    cd: (c: C) => D,
+    de: (d: D) => E,
+    ef: (e: E) => F,
+    fg: (f: F) => G,
+    gh: (g: G) => H,
+    hi: (h: H) => I,
+    ij: (i: I) => J,
+    jk: (j: J) => K,
+  ): K;
 }
 
 const pipe: Pipe = (value: any, ...fns: any) =>
@@ -613,6 +686,7 @@ export const RenderRemote = <E, A>({
 
 export {
   Combine,
+  Sequence,
   RemotePending,
   RemoteFailure,
   RemoteSuccess,

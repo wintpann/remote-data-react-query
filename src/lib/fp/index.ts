@@ -225,6 +225,52 @@ interface Sequence {
     f: RemoteQuery<E, F>,
     g: RemoteQuery<E, G>,
   ): RemoteData<E, [A, B, C, D, F, G]>;
+
+  <E, A, B, C, D, F, G, H>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+  ): RemoteData<E, [A, B, C, D, F, G, H]>;
+
+  <E, A, B, C, D, F, G, H, I>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I]>;
+
+  <E, A, B, C, D, F, G, H, I, J>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+    j: RemoteQuery<E, J>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I, J]>;
+
+  <E, A, B, C, D, F, G, H, I, J, K>(
+    a: RemoteQuery<E, A>,
+    b: RemoteQuery<E, B>,
+    c: RemoteQuery<E, C>,
+    d: RemoteQuery<E, D>,
+    f: RemoteQuery<E, F>,
+    g: RemoteQuery<E, G>,
+    h: RemoteQuery<E, H>,
+    i: RemoteQuery<E, I>,
+    j: RemoteQuery<E, J>,
+    k: RemoteQuery<E, K>,
+  ): RemoteData<E, [A, B, C, D, F, G, H, I, J, K]>;
 }
 
 const sequence: Sequence = ((...list: RemoteData<unknown, unknown>[]) => {
@@ -620,6 +666,7 @@ export const RenderRemote = <E, A>({
 
 export {
   Combine,
+  Sequence,
   RemotePending,
   RemoteFailure,
   RemoteSuccess,
