@@ -29,7 +29,8 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "lite"
+    "lite",
+    "v3lite"
   ],
   "scripts": {
     "prettier": "prettier --write src --ignore-unknown",
@@ -40,7 +41,7 @@
     "postbuild": "./postbuild.sh",
     "build:prod": "npx cross-env NODE_ENV=production rollup -c",
     "dev": "npx cross-env DISABLE_ESLINT_PLUGIN=true react-app-rewired start",
-    "build": "yarn lint && yarn test && rimraf dist lite && yarn build:prod",
+    "build": "yarn lint && yarn test && rimraf dist lite v3lite && yarn build:prod",
     "release": "yarn build && npx np"
   },
   "browserslist": [
@@ -51,15 +52,21 @@
   "peerDependencies": {
     "@tanstack/react-query": ">=4.0.0",
     "fp-ts": ">=2.0.0",
-    "react": ">=16.8.0"
+    "react": ">=16.8.0",
+    "react-query": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "fp-ts": {
       "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react-query": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.3",
     "@rollup/plugin-url": "^7.0.0",
@@ -91,6 +98,7 @@
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
+    "react-query": "^3.39.2",
     "react-scripts": "^5.0.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.77.0",

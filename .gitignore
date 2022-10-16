@@ -4,6 +4,7 @@
 node_modules
 dist
 lite
+v3lite
 
 example/node_modules
 example/build

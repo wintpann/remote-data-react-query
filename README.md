@@ -13,11 +13,14 @@
 
 ## Lite version
 
-There are 2 versions of this package, first one is BASED on [fp-ts](https://github.com/gcanti/fp-ts). Use this version if you already use fp-ts in your project
+There are 3 versions of this package, first one is BASED on [fp-ts](https://github.com/gcanti/fp-ts). Use this version if you already use fp-ts in your project
 > import { remote, RemoteData } from 'react-query-remote-data';
 
 More expected, you don't use fp-ts yet, in that case import lite version without fp-ts peer dependency
 > import { remote, RemoteData } from 'react-query-remote-data/lite';
+
+And a lite version for `react-query@3`
+> import { remote, RemoteData } from 'react-query-remote-data/v3lite';
 
 ## Guide
 Check out examples in this repo at `src/dev/stories` for comparison with classic approach.
@@ -55,6 +58,7 @@ export const UsageExample = () => {
 ```
 
 ## [Lite API](https://github.com/wintpann/remote-data-react-query/blob/main/API.lite.md)
+## [Lite API for react-query@3](https://github.com/wintpann/remote-data-react-query/blob/main/API.v3lite.md)
 ## [Normal API](https://github.com/wintpann/remote-data-react-query/blob/main/API.md)
 
 ## CHANGELOG
@@ -76,3 +80,6 @@ export const UsageExample = () => {
 ### 1.1.0 `14.10.2022`
 * Added `remove` and `refetch` methods to RemoteData
 * Added lite version (if you don't use fp-ts)
+
+### 1.2.0 `16.10.2022`
+* Added lite version `react-query@3`
