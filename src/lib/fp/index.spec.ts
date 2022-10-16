@@ -118,11 +118,11 @@ describe('remote-data-react-query', () => {
     const { initial, pending, refetching, failure, success } = setup();
     const map = remote.map((a: number) => a * 2);
 
-    expect(map(initial)).toStrictEqual(remote.initial);
-    expect(map(pending)).toStrictEqual(remote.pending());
-    expect(map(failure)).toStrictEqual(remote.failure(MOCK.FAILURE_VALUE));
-    expect(map(success)).toStrictEqual(remote.success(MOCK.SUCCESS_VALUE * 2));
-    expect(map(refetching)).toStrictEqual(remote.pending(MOCK.PENDING_VALUE * 2));
+    expectRemoteEqual(map(initial), remote.initial);
+    expectRemoteEqual(map(pending), remote.pending());
+    expectRemoteEqual(map(failure), remote.failure(MOCK.FAILURE_VALUE));
+    expectRemoteEqual(map(success), remote.success(MOCK.SUCCESS_VALUE * 2));
+    expectRemoteEqual(map(refetching), remote.pending(MOCK.PENDING_VALUE * 2));
   });
 
   it('should run fold correctly', () => {
