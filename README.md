@@ -83,3 +83,7 @@ export const UsageExample = () => {
 
 ### 1.2.0 `16.10.2022`
 * Added lite version `react-query@3`
+
+### 1.2.1 `17.10.2022`
+* Added UseQueryResult as generic for better type inference
+* Added more overloads for Pipe and Sequence
