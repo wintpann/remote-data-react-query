@@ -57,6 +57,10 @@ type RemoteData<E, A> = RemoteInitial | RemotePending<A> | RemoteSuccess<A> | Re
 
 const noop = () => undefined;
 
+const ignorePromise = (fn: () => Promise<any> | void) => (): void => {
+  void fn();
+};
+
 const pendingInternal = <A>(
   value?: A,
   remove?: () => void,
@@ -147,17 +151,19 @@ const isSuccess = <A>(data: RemoteData<unknown, A>): data is RemoteSuccess<A> =>
 const map =
   <A, E, B>(f: (a: A) => B) =>
   (data: RemoteData<E, A>): RemoteData<E, B> => {
-    if (isSuccess(data)) return successInternal(f(data.data), data.remove, data.refetch);
+    if (isSuccess(data))
+      return successInternal(f(data.data), data.remove, ignorePromise(data.refetch));
     // TODO think about what if A is actually undefined | null
     if (isPending(data) && data.data != null)
-      return pendingInternal(f(data.data), data.remove, data.refetch);
+      return pendingInternal(f(data.data), data.remove, ignorePromise(data.refetch));
     return data as RemoteData<E, B>;
   };
 
 const mapLeft =
   <EA, EB, A>(f: (a: EA) => EB) =>
   (data: RemoteData<EA, A>): RemoteData<EB, A> => {
-    if (isFailure(data)) return failureInternal(f(data.error), data.remove, data.refetch);
+    if (isFailure(data))
+      return failureInternal(f(data.error), data.remove, ignorePromise(data.refetch));
     return data as RemoteData<EB, A>;
   };
 
